@@ -46,71 +46,11 @@ class API:
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
         return requests.post(url, headers=self.default_headers, json=json)
 
-    def getHosts(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/hosts'
-
-        params = {
-            'page' : page,
-        }
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
-    def getAccounts(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/accounts'
-
-        params = {
-            'page' : page,
-        }
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
-    def getAmenities(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/amenities'
-        params = {
-            'page' : page,
-        }
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
-    def getRentals(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/rentals'
-
-        params = {
-            'page' : page,
-        }
-        # params['fields'] = 'id,name,headline,description,website_url,city'
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
     def getRental(self, rental_id):
         url = f'https://www.bookingsync.com/api/v3/rentals'
 
         params = {
             'id' : rental_id,
-        }
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
-    def getClients(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/clients'
-
-        params = {
-            'page' : page,
-        }
-        headers = self.default_headers
-
-        return requests.get(url, params=params, headers=headers)
-
-    def getBookings(self, page=1):
-        url = 'https://www.bookingsync.com/api/v3/bookings'
-
-        params = {
-            'page' : page,
         }
         headers = self.default_headers
 
@@ -246,7 +186,6 @@ class API:
 
 if __name__ == '__main__':
     api = API('abe6eec7aa51a5d7b59b4ad411ecb6e2f0777244d4b07f043e809b09d5e0d140')
-    # print(api.createBooking(128429, json).text)
 
 
 
