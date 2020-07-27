@@ -1,0 +1,8 @@
+{
+    "access_token": "cf9090a6c5a53bc0a1515de988b325543d1638e1867c2a4adefb94ec776ab7e5",
+    "token_type": "Bearer",
+    "expires_in": 7200,
+    "refresh_token": "86503d88b71854f1a183b5edd9b0d3d7b86d44a1d725e62301bbfe1c4f8a116f",
+    "scope": "public bookings_read rentals_read bookings_write rentals_write clients_write inbox_write",
+    "created_at": 1595887166
+}
