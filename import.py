@@ -2,7 +2,7 @@ import requests, json, csv
 
 from datetime import datetime, timedelta
 
-from BookingSync.api import API
+from BookingSyncApi.api import API
 
 def createClient(api, fullname, email, phone, country_code):
     url = f'https://www.bookingsync.com/api/v3/clients'
@@ -17,7 +17,9 @@ def createClient(api, fullname, email, phone, country_code):
 
     headers = api.getDefaultHeaders()
 
-    client_id = requests.post(url, headers=headers, json=json).json()['clients'][0]['id']
+    response = requests.post(url, headers=headers, json=json).json()
+    # print(response)
+    client_id = response['clients'][0]['id']
 
     url += f'/{client_id}'
 
@@ -69,7 +71,7 @@ def createBooking(api, rentalID, json):
 
 def importBookings():
     api = API()
-    with open('import_POZ-1.csv', encoding='utf-8-sig') as inputfile, open('import_status.csv', 'w') as outputfile:
+    with open('import_WAW-1.csv', encoding='utf-8-sig') as inputfile, open('import_status.csv', 'w') as outputfile:
         reader = csv.DictReader(inputfile, delimiter=';')
         writer = csv.DictWriter(outputfile, fieldnames=reader.fieldnames + ['bookingID',], delimiter=';')
         writer.writeheader()
@@ -97,8 +99,11 @@ def importBookings():
             }
 
             response = createBooking(api, row['BSYNC RENTAL ID'], json)
+            print(20*'-')
+            print(f'ADDING BOOKING: {row["BSYNC RENTAL ID"]}')
             print(response.status_code)
             print(response.text)
+            print(20*'-')
             try:
                 row['bookingID'] = response.json()['bookings'][0]['id']
             except:
