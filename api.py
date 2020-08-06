@@ -1,6 +1,8 @@
 import requests, json, csv
 from datetime import datetime, timedelta
 
+import os
+
 class API:
 
     def __init__(self, auth_code=None):
@@ -8,8 +10,9 @@ class API:
         self.client_id = 'f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64'
         self.client_secret = '995da035eb74a397ed4dfae342303686626367e1cc84f6a29c646e390aac5c35'
 
+        self.credsPath = os.path.dirname(os.path.abspath(__file__)) + '/creds.json'
         try: 
-            with open('creds.json', 'r') as f:
+            with open(self.credsPath, 'r') as f:
                 creds = json.load(f)
         except:
             print("Couldn't load credentials from file. Using manual authorization.")
@@ -42,13 +45,14 @@ class API:
         token_url = 'https://www.bookingsync.com/oauth/token'
 
         access_token_response = requests.post(token_url, data=data, verify=False, allow_redirects=False, auth=(self.client_id, self.client_secret))
+        print(access_token_response.text)
 
         if access_token_response.status_code == 401:
             raise Exception('Failed to authorize.')
 
         tokens = json.loads(access_token_response.text)
 
-        with open('creds.json', 'w') as f:
+        with open(self.credsPath, 'w') as f:
             json.dump(tokens, f, indent=4)
 
         return tokens['access_token']
@@ -85,7 +89,7 @@ class API:
 
 
 if __name__ == '__main__':
-    api = API()
+    api = API('e6686060af63afd61f9f163b27e237a1cba477cee4a5837cc8189e747116791e')
     print(dict(api.get('/accounts').headers))
 
 
