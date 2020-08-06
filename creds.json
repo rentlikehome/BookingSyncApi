@@ -1,8 +1,8 @@
 {
-    "access_token": "560e5cea503e1bea24905cc689f91889d23f5936ea35a1e70c3ad9e13dcdd781",
+    "access_token": "92d4ce9ce5888f84a335cad0bae8a8987f1137948606dd788b3f9a86a0e63cc8",
     "token_type": "Bearer",
     "expires_in": 7200,
-    "refresh_token": "181c5cd44686cd0482b0b1b804bb94256fae4b0574dc2f5b4bcc25bc6cff3cf3",
+    "refresh_token": "d191ccc517300a311878630e657c6131d7904a7cd3835c677ea2c60a93d02145",
     "scope": "public bookings_read rentals_read bookings_write rentals_write clients_write inbox_write",
-    "created_at": 1596003891
+    "created_at": 1596557182
 }

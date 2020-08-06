@@ -79,10 +79,14 @@ class API:
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
         return requests.post(url, headers=self.getDefaultHeaders(), json=json)
 
+    def put(self, endpoint, json):
+        url = f'https://www.bookingsync.com/api/v3{endpoint}'
+        return requests.put(url, headers=self.getDefaultHeaders(), json=json)
+
 
 if __name__ == '__main__':
     api = API()
-    print(api.get('/bookings').text)
+    print(dict(api.get('/accounts').headers))
 
 
 
