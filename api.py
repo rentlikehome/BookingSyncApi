@@ -2,6 +2,7 @@ import requests, json, csv
 from datetime import datetime, timedelta
 
 import os
+import json
 
 class API:
 
@@ -40,7 +41,7 @@ class API:
 
     def authorize(self, data):
         # Taken from here
-        # testurl =  'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rentals_read%20bookings_write%20rentals_write%20clients_write%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
+        # testurl =  'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rates_write%20rentals_read%20bookings_write%20rentals_write%20clients_write%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
 
         token_url = 'https://www.bookingsync.com/oauth/token'
 
@@ -89,8 +90,19 @@ class API:
 
 
 if __name__ == '__main__':
-    api = API('e6686060af63afd61f9f163b27e237a1cba477cee4a5837cc8189e747116791e')
-    print(dict(api.get('/accounts').headers))
+    api = API('5a07f0e26aedab2a2c9d4bc26419e388cfcc061f0ed3e519e192be83a867df62')
+    # print(api.get('/rates_tables/347606').text)
+
+    with open('bookings_fees.csv', 'w') as csvfile:
+        fieldnames = ['id', 'booking_id', 'name', 'price', 'required', 'included_in_price', 'times_booked', 'created_at', 'updated_at', 'locked', 'canceled_at']
+        writer = csv.DictWriter(csvfile, fieldnames, extrasaction='ignore')
+        writer.writeheader()
+        for page in range(1, 60):
+            json = api.get(f'/bookings_fees?page={page}').json()
+            for fee in json['bookings_fees']:
+                fee['name'] = fee['name']['en']
+                fee['booking_id'] = fee['links']['booking']
+                writer.writerow(fee)
 
 
 
