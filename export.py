@@ -69,5 +69,5 @@ def getBookingsStartingToday():
 
 
 
-getBookingsStartingToday()
-# export()
+# getBookingsStartingToday()
+export()

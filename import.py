@@ -77,7 +77,7 @@ def createBooking(api, rentalID, json):
 
 def importBookings():
     api = API()
-    with open('import_WAW-3.csv', encoding='utf-8-sig') as inputfile, open('import_status.csv', 'w') as outputfile:
+    with open('IMPORT_GDA_070920.csv', encoding='utf-8-sig') as inputfile, open('import_status.csv', 'w') as outputfile:
         reader = csv.DictReader(inputfile, delimiter=';')
         writer = csv.DictWriter(outputfile, fieldnames=reader.fieldnames + ['bookingID',], delimiter=';')
         writer.writeheader()
@@ -100,14 +100,15 @@ def importBookings():
                         "client_id" : client_id,
                         "links": {
                             "source": 12303
-                        }
+                        },
+                        "notes" : row['Uwagi']
                     }
                 ]
             }
 
-            response = createBooking(api, row['BSYNC RENTAL ID'], json)
+            response = createBooking(api, row['BSYNC ID'], json)
             print(20*'-')
-            print(f'ADDING BOOKING: {row["BSYNC RENTAL ID"]}')
+            print(f'ADDING BOOKING: {row["BSYNC ID"]}')
             print(response.status_code)
             print(response.text)
             print(20*'-')
