@@ -90,7 +90,7 @@ class API:
 
 
 if __name__ == '__main__':
-    api = API('5a07f0e26aedab2a2c9d4bc26419e388cfcc061f0ed3e519e192be83a867df62')
+    api = API('c99eb8852de1dd6423ab3f00eb3a2aa722f2a8bd995b3ce1809be62cbc1a9e12')
     # print(json.dumps(api.get('/rentals/128555').json(), indent=4))
 
 

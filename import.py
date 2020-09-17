@@ -77,7 +77,7 @@ def createBooking(api, rentalID, json):
 
 def importBookings():
     api = API()
-    with open('IMPORT_GDA_070920.csv', encoding='utf-8-sig') as inputfile, open('import_status.csv', 'w') as outputfile:
+    with open('1509_IMPORT_ZAK.csv', encoding='utf-8-sig', mode='rU', newline='') as inputfile, open('import_status.csv', 'w') as outputfile:
         reader = csv.DictReader(inputfile, delimiter=';')
         writer = csv.DictWriter(outputfile, fieldnames=reader.fieldnames + ['bookingID',], delimiter=';')
         writer.writeheader()
