@@ -1,14 +1,28 @@
-from api import API
+from BookingSyncApi.api import API
+import json, csv
+import pandas as pd
+from datetime import datetime
 
-api = API('5a07f0e26aedab2a2c9d4bc26419e388cfcc061f0ed3e519e192be83a867df62')
+##
+def export_fees():
+    api = API()
 
-with open('bookings_fees.csv', 'w') as csvfile:
-    fieldnames = ['id', 'booking_id', 'name', 'price', 'required', 'included_in_price', 'times_booked', 'created_at', 'updated_at', 'locked', 'canceled_at']
-    writer = csv.DictWriter(csvfile, fieldnames, extrasaction='ignore')
-    writer.writeheader()
-    for page in range(1, 60):
-        json = api.get(f'/bookings_fees?page={page}').json()
-        for fee in json['bookings_fees']:
-            fee['name'] = fee['name']['en']
-            fee['booking_id'] = fee['links']['booking']
-            writer.writerow(fee)
+    with open('fees.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        fieldnames = ['name', 'city', 'price']
+        writer.writerow(fieldnames)
+
+        for page in range(1, 32):
+            response = api.get(f'/bookings?include=bookings_fees,rental&from=20200731&page={page}').json()
+            for booking in response['bookings']:
+
+                parsedStartDate = datetime.strptime(booking['start_at'], "%Y-%m-%dT%H:%M:%SZ")
+                if parsedStartDate.month == 8:
+                    for fee in booking['bookings_fees']:
+                        writer.writerow([fee['name']['en'], booking['rental']['city'], fee['price']])
+##
+
+
+if __name__ == '__main__':
+    # export_fees()
+    print('text')

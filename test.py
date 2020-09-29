@@ -3,4 +3,5 @@ import json
 
 api = API()
 
-print(json.dumps(api.get('/bookings?include=bookings_fees,rental').json()['bookings'][0], indent=4))
+print(json.dumps(api.get('/rentals?include=rentals_tags').json(), indent=4))
+

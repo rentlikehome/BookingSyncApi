@@ -80,6 +80,10 @@ class API:
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
         return requests.get(url, headers=self.getDefaultHeaders())
 
+    def delete(self, endpoint):
+        url = f'https://www.bookingsync.com/api/v3{endpoint}'
+        return requests.delete(url, headers=self.getDefaultHeaders())
+
     def post(self, endpoint, json):
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
         return requests.post(url, headers=self.getDefaultHeaders(), json=json)
@@ -91,7 +95,8 @@ class API:
 
 if __name__ == '__main__':
     api = API('c99eb8852de1dd6423ab3f00eb3a2aa722f2a8bd995b3ce1809be62cbc1a9e12')
-    # print(json.dumps(api.get('/rentals/128555').json(), indent=4))
+    headers = api.get('/rentals').headers
+    print(headers['x-ratelimit-remaining'])
 
 
 

@@ -7,6 +7,9 @@ from BookingSyncApi.api import API
 def createClient(api, fullname, email, phone, country_code):
     url = f'https://www.bookingsync.com/api/v3/clients'
 
+    if not fullname:
+        return None
+
     json = {
         "clients" : [
             {
@@ -22,8 +25,8 @@ def createClient(api, fullname, email, phone, country_code):
     except:
         phone = ''
 
-    response = requests.post(url, headers=headers, json=json).json()
-    client_id = response['clients'][0]['id']
+    response = requests.post(url, headers=headers, json=json)
+    client_id = response.json()['clients'][0]['id']
 
     url += f'/{client_id}'
 
@@ -77,10 +80,11 @@ def createBooking(api, rentalID, json):
 
 def importBookings():
     api = API()
-    with open('1509_IMPORT_ZAK.csv', encoding='utf-8-sig', mode='rU', newline='') as inputfile, open('import_status.csv', 'w') as outputfile:
+    with open('2209_IMPORT_MIE.csv', encoding='utf-8-sig', newline='') as inputfile, open('import_status.csv', 'w') as outputfile:
         reader = csv.DictReader(inputfile, delimiter=';')
         writer = csv.DictWriter(outputfile, fieldnames=reader.fieldnames + ['bookingID',], delimiter=';')
         writer.writeheader()
+
         for row in reader:
             client_id = createClient(api, row['Nazwisko'], row['Email'], row['Telefon'], 'PL')
             parsedStartDate = datetime.strptime(row['startDate'], '%d.%m.%Y %H:%M')
@@ -98,20 +102,14 @@ def importBookings():
                         "start_at": parsedStartDate.isoformat(),
                         "end_at": parsedEndDate.isoformat(),
                         "client_id" : client_id,
-                        "links": {
-                            "source": 12303
-                        },
+                        "source_id": 12303,
                         "notes" : row['Uwagi']
                     }
                 ]
             }
 
             response = createBooking(api, row['BSYNC ID'], json)
-            print(20*'-')
-            print(f'ADDING BOOKING: {row["BSYNC ID"]}')
-            print(response.status_code)
-            print(response.text)
-            print(20*'-')
+            print(f'ADDING BOOKING: {row["BSYNC ID"]}\n\tStatus(201=GOOD): {response.status_code}')
             try:
                 row['bookingID'] = response.json()['bookings'][0]['id']
             except:

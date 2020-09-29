@@ -20,9 +20,7 @@ def modify_multiple_terms(row):
     midmap = mapJson['map'].split(',')
     start = datetime.strptime(mapJson['start_date'], "%Y-%m-%d")
     terms = [
-                ('rate1', start.date(), date(2020, 11, 1)),
-                ('rate2', date(2020, 11, 1), date(2021, 4, 1)),
-                ('rate3', date(2021, 4, 1), date(2021, 9, 10))
+                ('rate1', start.date(), date(2021, 4, 1)),
             ]
 
     index = 0
@@ -86,5 +84,5 @@ def modify_maps(filename):
     #     converted_value = str(row['value']) + '.0'
     #     modify_map(row['id'], converted_value, datetime(2020, 9, 30))
 
-modify_maps('mid_term_sheet.xlsx')
+modify_maps('rules.xlsx')
     

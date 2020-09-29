@@ -8,6 +8,7 @@ def getRentals(api, page=1):
 
     params = {
         'page' : page,
+        'include' : 'rentals_tags',
     }
     headers = api.getDefaultHeaders()
 
@@ -16,13 +17,15 @@ def getRentals(api, page=1):
 def export():
     api = API()
     json = getRentals(api).json()
-    csvFields = ['id', 'name', 'city', 'headline', 'description', 'website_url']
+    csvFields = ['id', 'name', 'city', 'rentals_tags']
+
     with open('export.csv', 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=csvFields, extrasaction='ignore')
         writer.writeheader()
         for page in range(1, int(json['meta']['X-Total-Pages']) + 1):
             data = getRentals(api, page).json()
             for row in data['rentals']:
+                row['rentals_tags'] = ';'.join([tag['name']['en'] for tag in row['rentals_tags']])
                 writer.writerow(row)
 
 def getBookingsStartingToday():
