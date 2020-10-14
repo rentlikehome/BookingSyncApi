@@ -28,6 +28,20 @@ def export():
                 row['rentals_tags'] = ';'.join([tag['name']['en'] for tag in row['rentals_tags']])
                 writer.writerow(row)
 
+def export_fees_from_rental():
+    api = API()
+    json = getRentals(api).json()
+    csvFields = ['id', 'name', 'city', '']
+
+    with open('export.csv', 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csvFields, extrasaction='ignore')
+        writer.writeheader()
+        for page in range(1, int(json['meta']['X-Total-Pages']) + 1):
+            data = getRentals(api, page).json()
+            for row in data['rentals']:
+                row['rentals_tags'] = ';'.join([tag['name']['en'] for tag in row['rentals_tags']])
+                writer.writerow(row)
+
 def getBookingsStartingToday():
     api = API()
 
