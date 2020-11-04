@@ -39,5 +39,28 @@ def export_fees_from_rental():
                     fee['city'] = row['city']
                     writer.writerow(fee)
 
+def export_cleaning_fees():
+    api = API()
+    response = api.get('/rentals').json()
+
+    csvFields = ['rental_id', 'rental_name', 'city', 'sleeps_max', 'surface', 'rate', 'name', ]
+
+    with open('export.csv', 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csvFields, extrasaction='ignore')
+        writer.writeheader()
+        for page in range(1, int(response['meta']['X-Total-Pages']) + 1):
+            data = api.get(f'/rentals?include=rentals_fees&page={page}').json()
+            for row in data['rentals']:
+                for fee in row['rentals_fees']:
+                    fee['name'] = fee['name']['en']
+                    fee['rental_id'] = row['id']
+                    fee['rental_name'] = row['name']
+                    fee['city'] = row['city']
+                    fee['sleeps_max'] = row['sleeps_max']
+                    fee['surface'] = row['surface']
+
+                    if 'Cleaning' in fee['name']:
+                        writer.writerow(fee)
+
 if __name__ == '__main__':
-    export_fees_from_rental()
+    export_cleaning_fees()

@@ -94,7 +94,7 @@ class API:
 
 
 if __name__ == '__main__':
-    api = API('c99eb8852de1dd6423ab3f00eb3a2aa722f2a8bd995b3ce1809be62cbc1a9e12')
+    api = API('ed35ea8df616791738b09e40fa7ba77ddf38fbcfda7295f0dde754c16250dc95')
     headers = api.get('/rentals').headers
     print(headers['x-ratelimit-remaining'])
 
