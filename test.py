@@ -4,7 +4,7 @@ import pandas as pd
 
 api = API()
 
-print(json.dumps(api.get('/booking_comments?page=112').json(), indent=4))
+print(json.dumps(api.get('/payments/8861993').json(), indent=4))
 
 
 
