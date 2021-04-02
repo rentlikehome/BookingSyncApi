@@ -7,17 +7,20 @@ api = API()
 payload = {
     "special_offers": [
             {
-                "name_en": "Early booker",
-                "name_pl": "Wczesna rezerwacja",
-                "name_de": "Early Booker",
-                "start_date": "2021-04-01",
+                "name_en": "Special offer",
+                "name_pl": "Oferta specjalna",
+                "name_de": "Sonderangebot",
+                "start_date": "2021-02-28",
                 "end_date": "2021-06-30",
                 "discount": 15.0,
             }
         ]
 }
 
-df = pd.read_excel('GDA.xlsx')
+df = pd.read_excel('rentals.xlsx')
+
+cityFilter = df['name'].str[:3] == 'KOŁ'
+df = df[cityFilter]
 
 for index, row in df.iterrows():
-    print(json.dumps(api.post(f'/rentals/{row["id"]}/special_offers', payload).json(), indent=4))
+    print(api.post(f'/rentals/{row["id"]}/special_offers', payload).json())

@@ -41,7 +41,7 @@ class API:
 
     def authorize(self, data):
         # Taken from here
-        # testurl =  'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rates_write%20rentals_read%20bookings_write%20rentals_write%20clients_write%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
+        # testurl =  'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rates_write%20rentals_read%20bookings_write%20rentals_write%20clients_write%20payments_read%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
 
         token_url = 'https://www.bookingsync.com/oauth/token'
 
@@ -94,7 +94,7 @@ class API:
 
 
 if __name__ == '__main__':
-    api = API('ed35ea8df616791738b09e40fa7ba77ddf38fbcfda7295f0dde754c16250dc95')
+    api = API('135b7da8ae141031fead790513828f29cee8410e97d430cd9fdf2aedaf349743')
     headers = api.get('/rentals').headers
     print(headers['x-ratelimit-remaining'])
 

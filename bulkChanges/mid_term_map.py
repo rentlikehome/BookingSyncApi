@@ -4,9 +4,7 @@ import pandas as pd
 
 from datetime import datetime, date
 
-api = API()
-
-def modify_multiple_terms(row):
+def modify_multiple_terms(row, api):
     try:
         rental = api.get(f'/rentals/{row["id"]}').json()['rentals'][0]
     except:
@@ -44,6 +42,7 @@ def modify_multiple_terms(row):
     print(json.dumps(response, indent=4))
 
 def modify_map(rental_id, value, end):
+    api = API()
     # print(json.dumps(api.get('/rentals/128555').json(), indent=4))
 
     rental = api.get(f'/rentals/{rental_id}').json()['rentals'][0]
@@ -75,14 +74,16 @@ def modify_map(rental_id, value, end):
 
 
 def modify_maps(filename):
+    api = API()
     df = pd.read_excel(filename)
 
     for index in range(df.shape[0]):
-        modify_multiple_terms(df.iloc[index])
+        modify_multiple_terms(df.iloc[index], api)
 
     # for index, row in df.iterrows():
     #     converted_value = str(row['value']) + '.0'
     #     modify_map(row['id'], converted_value, datetime(2020, 9, 30))
 
-modify_maps('rules.xlsx')
+
+# modify_maps('rules.xlsx')
     

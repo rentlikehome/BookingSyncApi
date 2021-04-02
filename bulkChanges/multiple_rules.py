@@ -61,7 +61,9 @@ def modify_table():
             rentals = table['links']['rentals']
             if rentals and rentals[0] in df.index:
                 for rule in table["rates_rules"]:
-                    if rule['kind'] == 'stay_at_least' and rule['variables']['length'] == 7:
+                    if rule['kind'] == 'arrival_only' and rule['variables']['days'] == [3, 5] and rule['period_name'] == 'Wielkanoc':
+                        print(rentals[0], api.delete(f'/rates_rules/{rule["id"]}').text)
+                    if rule['kind'] == 'departure_only' and rule['variables']['days'] == [3, 5] and rule['period_name'] == 'Wielkanoc':
                         print(rentals[0], api.delete(f'/rates_rules/{rule["id"]}').text)
 
                 # print(api.post(f'/rates_tables/{table["id"]}/rates_rules', newRule).text)

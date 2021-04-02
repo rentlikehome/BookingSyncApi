@@ -29,8 +29,10 @@ def export_mid_term_rates():
                 end_date = start_date + datetime.timedelta(days=len(list(grouper)))
                 new_row.append(end_date.date())
                 new_row.append(price)
+                if price != '0':
+                    rows.append(new_row)
+
                 start_date = end_date
-                rows.append(new_row)
 
     df = pd.DataFrame(rows, columns=columns)
     df.to_excel('mid_term_maps.xlsx')

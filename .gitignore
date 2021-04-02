@@ -1,4 +1,7 @@
 archive/
 __pycache__/
 creds.json
+*.xlsx
+*Zone.Identifier
+**/*.pyc
 

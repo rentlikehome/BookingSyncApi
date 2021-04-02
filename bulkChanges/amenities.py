@@ -19,21 +19,11 @@ def createPayload(amenity_id):
 
 pages = int(api.get(f'/rentals').json()['meta']['X-Total-Pages'])
 
-cutoff_id = 134383
-cutoff = False
 
 for page in range(1, pages + 1):
     response = api.get(f'/rentals?page={page}').json()
 
     for rental in response['rentals']:
-        if cutoff:
-            print(rental['id'])
-            print(api.post(f'/rentals/{rental["id"]}/rentals_amenities', createPayload(348)).status_code)
-            print(api.post(f'/rentals/{rental["id"]}/rentals_amenities', createPayload(349)).status_code)
-        else:
-            if rental['id'] != cutoff_id:
-                print('Skipping...')
-            else:
-                print('Found cutoff')
-                cutoff = True
+        print(rental['id'])
+        print(api.post(f'/rentals/{rental["id"]}/rentals_amenities', createPayload(93)).status_code)
 
