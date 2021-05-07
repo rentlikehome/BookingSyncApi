@@ -4,22 +4,26 @@ import pandas as pd
 
 api = API()
 
-en = """Due to public safety restrictions, stays with check-in from 20/03/2020 to 03/05/2021 may only be available to guests traveling for certain reasons:
+en = """Due to public safety restrictions, stays with check-in from 20/03/2020 to 07/05/2021 may only be available to guests traveling for certain reasons:
 - business trips in accordance with the list specified in the regulation, - - participation in sports-related competitions or groupings,
 - being a health care worker, patient or his guardian,
 - beeing a foreigner unable to continue traveling to a permanent place of residence.
 
 Stay with us in the above-mentioned The period will require a CERTIFICATE issued by the relevant institutions, depending on the reason for travel.
 
+The Prana Spa complex is closed (swimming pools, saunas, spa). Initially until 07/05/2021.
+
 ---"""
 
-pl = """Ze względu na ograniczenia bezpieczeństwa publicznego pobyty z zameldowaniem od 20.03.2020 do 03.05.2021 mogą być dostępne tylko dla gości podróżujących z określonych powodów:
+pl = """Ze względu na ograniczenia bezpieczeństwa publicznego pobyty z zameldowaniem od 20.03.2020 do 07.05.2021 mogą być dostępne tylko dla gości podróżujących z określonych powodów:
 - podróże służbowe zgodne z listą określoną w rozporządzeniu,
 - udział w zawodach lub zgrupowaniach związanych ze sportem,
 - bycie pracownikiem służby zdrowia, pacjentem lub jego opiekunem,
 - bycie cudzoziemcem niemogącym kontynuować podróży do stałego miejsca zamieszkania.
 
 Pobyt u nas w ww. Okresie będzie wymagał ZAŚWIADCZENIA wydanego przez odpowiednie instytucje, w zależności od powodu podróży.
+
+Kompleks Prana Spa jest zamknięty (baseny, sauny, spa). Wstępnie do 07.05.2021.
 
 ---"""
 
@@ -30,9 +34,9 @@ for page in range(1, pages + 1):
     data = api.get(f'/rentals?page={page}').json()
     for rental in data['rentals']:
         # Only the rest
-        if rental['name'][:3] in ['WRO', 'POZ', 'MIE', 'ZAK', 'KOŁ', 'WAW']:
+        # if rental['name'][:3] in ['WRO', 'POZ', 'MIE', 'ZAK',  'WAW']:
         # Only for KOŁ and GDA
-        # if rental['name'][:3] in ['GDA', ]:
+        if rental['name'][:3] in ['GDA', ]:
         # ALL
         # if True:
             print(rental['name'][:3], rental['id'])
