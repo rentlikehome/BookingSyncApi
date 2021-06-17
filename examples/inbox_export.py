@@ -62,5 +62,5 @@ def exportConversations():
     df.to_excel("inbox_conversations.xlsx", engine='xlsxwriter')
 
 
-exportMessages()
-# exportConversations()
+# exportMessages()
+exportConversations()

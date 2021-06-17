@@ -4,28 +4,9 @@ import pandas as pd
 
 api = API()
 
-en = """Due to public safety restrictions, stays with check-in from 20/03/2020 to 07/05/2021 may only be available to guests traveling for certain reasons:
-- business trips in accordance with the list specified in the regulation, - - participation in sports-related competitions or groupings,
-- being a health care worker, patient or his guardian,
-- beeing a foreigner unable to continue traveling to a permanent place of residence.
+en = """---"""
 
-Stay with us in the above-mentioned The period will require a CERTIFICATE issued by the relevant institutions, depending on the reason for travel.
-
-The Prana Spa complex is closed (swimming pools, saunas, spa). Initially until 07/05/2021.
-
----"""
-
-pl = """Ze względu na ograniczenia bezpieczeństwa publicznego pobyty z zameldowaniem od 20.03.2020 do 07.05.2021 mogą być dostępne tylko dla gości podróżujących z określonych powodów:
-- podróże służbowe zgodne z listą określoną w rozporządzeniu,
-- udział w zawodach lub zgrupowaniach związanych ze sportem,
-- bycie pracownikiem służby zdrowia, pacjentem lub jego opiekunem,
-- bycie cudzoziemcem niemogącym kontynuować podróży do stałego miejsca zamieszkania.
-
-Pobyt u nas w ww. Okresie będzie wymagał ZAŚWIADCZENIA wydanego przez odpowiednie instytucje, w zależności od powodu podróży.
-
-Kompleks Prana Spa jest zamknięty (baseny, sauny, spa). Wstępnie do 07.05.2021.
-
----"""
+pl = """---"""
 
 pages = int(api.get('/rentals').json()['meta']['X-Total-Pages'])
 

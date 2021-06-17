@@ -7,14 +7,14 @@ api = API()
 
 df = pd.read_excel('downpayment.xlsx')
 
-cityFilter = df['name'].str[:3] == 'MIE'
-df = df[cityFilter]
+# cityFilter = df['name'].str[:3].isin(['WAW', 'WRO', 'POZ', 'GDA'])
+# df = df[cityFilter]
 
 for index, row in df.iterrows():
     payload = {
     "rentals": [
         {
-            'balance_due' : 3,
+            'downpayment' : 30,
         }
     ]
     }
