@@ -29,6 +29,13 @@ def create_booking(start_hour):
 
     return booking
 
+def block_rental(api, rental_id, start_hour):
+    payload = { "bookings" : [create_booking(start_hour), ] }
+    response = api.post(f'/rentals/{rental_id}/bookings', payload)
+    print(response.status_code)
+    print(response.text)
+
+
 """
 Assumptions:
 - city_code is taken from first 3 chars of rental name
@@ -49,11 +56,8 @@ def block_rentals(city_code, start_hour):
         data = api.get(f'/rentals?include=rentals_tags&page={page}').json()
         for rental in data['rentals']:
             if rental['name'][:3] == city_code:
-                payload = { "bookings" : [create_booking(start_hour), ] }
-                response = api.post(f'/rentals/{rental["id"]}/bookings', payload)
-                print(response.status_code)
-                print(response.text)
+                block_rental(api, rental['id'], start_hour)
 
 
 if __name__ == '__main__':
-    block_rentals("ZAK", 16)
+    block_rentals("POZ", 18)
