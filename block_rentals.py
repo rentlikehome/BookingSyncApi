@@ -55,6 +55,7 @@ to take this into account.
 """
 
 def block_rentals(city_code, start_hour):
+    print("Starting blocking")
     api = API()
 
     pages = int(api.get('/rentals?include=rentals_tags').json()['meta']['X-Total-Pages'])
@@ -67,6 +68,4 @@ def block_rentals(city_code, start_hour):
 
 
 if __name__ == '__main__':
-    # api = API()
     block_rentals("POZ", 18)
-    # block_rental(api, '128569', 18)
