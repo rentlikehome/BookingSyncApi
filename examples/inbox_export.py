@@ -19,19 +19,22 @@ def exportMessages():
             print('Error')
             continue
         for message in messages:
-            row = []
-            row.append(message['id'])
-            row.append(message['origin'])
-            row.append(message['sent_at'])
-            row.append(message['sender']['links']['member']['type'])
-            if message['sender']['links']['member']['type'] == 'Host':
-                host = hosts[message['sender']['links']['member']['id']]
-                row.append(f"{host['firstname']} {host['lastname']} ({host['email']})")
-            else:
-                row.append('-')
-            row.append(message['content'])
+            try:
+                row = []
+                row.append(message['id'])
+                row.append(message['origin'])
+                row.append(message['sent_at'])
+                row.append(message['sender']['links']['member']['type'])
+                if message['sender']['links']['member']['type'] == 'Host':
+                    host = hosts[message['sender']['links']['member']['id']]
+                    row.append(f"{host['firstname']} {host['lastname']} ({host['email']})")
+                else:
+                    row.append('-')
+                row.append(message['content'])
 
-            rows.append(row)
+                rows.append(row)
+            except:
+                print('Error at row')
 
     columns = ['id', 'origin', 'sent_at', 'sender_type', 'host [firstname lastname (email)]', 'content']
     df = pd.DataFrame(rows, columns=columns)
@@ -62,5 +65,5 @@ def exportConversations():
     df.to_excel("inbox_conversations.xlsx", engine='xlsxwriter')
 
 
-# exportMessages()
-exportConversations()
+exportMessages()
+# exportConversations()
