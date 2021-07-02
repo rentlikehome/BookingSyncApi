@@ -32,6 +32,13 @@ def create_booking(start_hour):
 def block_rental(api, rental_id, start_hour):
     payload = { "bookings" : [create_booking(start_hour), ] }
     response = api.post(f'/rentals/{rental_id}/bookings', payload)
+
+    if response.status_code == 503:
+        response = api.post(f'/rentals/{rental_id}/bookings', payload)
+
+    if response.status_code == 503:
+        print(f'Got 503 twice in a row. Skipping {rental_id}.')
+
     print(response.status_code)
     print(response.text)
 
@@ -60,4 +67,6 @@ def block_rentals(city_code, start_hour):
 
 
 if __name__ == '__main__':
+    # api = API()
     block_rentals("POZ", 18)
+    # block_rental(api, '128569', 18)
