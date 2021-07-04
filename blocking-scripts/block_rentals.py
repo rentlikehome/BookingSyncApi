@@ -55,7 +55,8 @@ to take this into account.
 """
 
 def block_rentals(city_code, start_hour):
-    print("Starting blocking")
+    print(20*"-")
+    print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
     api = API()
 
     pages = int(api.get('/rentals?include=rentals_tags').json()['meta']['X-Total-Pages'])
@@ -65,6 +66,7 @@ def block_rentals(city_code, start_hour):
         for rental in data['rentals']:
             if rental['name'][:3] == city_code:
                 block_rental(api, rental['id'], start_hour)
+    print(20*"-")
 
 
 if __name__ == '__main__':
