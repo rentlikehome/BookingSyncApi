@@ -11,7 +11,7 @@ def add_fee(api, rental_id, fee_id):
         {
         "always_applied": True,
         "fee_id": fee_id,
-        "status": "required"
+        "status": "private"
         }
     ]
     }
@@ -23,13 +23,14 @@ def add_fees():
     api = API()
     df = pandas.read_excel('fees.xlsx')
 
-    cityFilter = df['name'].str[:3] == 'MIE'
-    df = df[cityFilter]
+    cityFilter = df['name'].str[:3].isin(['ZAK'])
+    parkingFilter = df['name'].str.contains('parking', case=False)
+    df = df[cityFilter & (~ parkingFilter) ]
 
-    fees = [39949]
+    fees = [41480]
 
     for _, row in df.iterrows():
-        print(row['id'])
+        print(row['id'], row['name'])
         for fee_id in fees:
             add_fee(api, row['id'], fee_id)
 
@@ -60,6 +61,6 @@ def get_fees():
 
 
 if __name__ == '__main__':
-    get_fees()
+    add_fees()
 
 
