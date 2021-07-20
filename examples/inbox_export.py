@@ -1,22 +1,28 @@
 import json
+import traceback
 from BookingSyncApi.api import API
 import pandas as pd
 
 def exportMessages():
     api = API()
-    hostData = api.get('/hosts').json()
-    hosts = { host['id'] : host for host in hostData['hosts']}
+
+    hostPages = int(api.get('/hosts').json()['meta']['X-Total-Pages'])
+    hosts = {}
+    for page in range(1, hostPages+1):
+        hostData = api.get(f'/hosts?page={page}').json()
+        hosts.update({ host['id'] : host for host in hostData['hosts']})
 
     rows = []
 
     pages = int(api.get('/inbox/messages?include=sender,hosts').json()['meta']['X-Total-Pages'])
-    print(pages)
-    for page in range(1, pages):
+    print(f'Exporting messages. Number of pages: {pages}')
+
+    for page in range(1, pages + 1):
         print(page)
         try:
             messages = api.get(f'/inbox/messages?include=sender,hosts&page={page}').json()['messages']
         except:
-            print('Error')
+            print('Error at getting the page.')
             continue
         for message in messages:
             try:
@@ -34,11 +40,16 @@ def exportMessages():
 
                 rows.append(row)
             except:
-                print('Error at row')
+                print('Error at row.')
+                traceback.print_exc()
+                print()
+
 
     columns = ['id', 'origin', 'sent_at', 'sender_type', 'host [firstname lastname (email)]', 'content']
     df = pd.DataFrame(rows, columns=columns)
-    df.to_excel("inbox_messages.xlsx", engine='xlsxwriter')
+    writer = pd.ExcelWriter(r"inbox_messages.xlsx", engine='xlsxwriter', options={'strings_to_urls' : False})
+    df.to_excel(writer)
+    writer.close()
 
 
 def exportConversations():
@@ -47,8 +58,9 @@ def exportConversations():
     rows = []
 
     pages = int(api.get('/inbox/conversations').json()['meta']['X-Total-Pages'])
-    for page in range(1, pages):
+    for page in range(1, pages + 1):
         conversations = api.get(f'/inbox/conversations?page={page}').json()['conversations']
+
         for conv in conversations:
             row = []
             row.append(conv['id'])
