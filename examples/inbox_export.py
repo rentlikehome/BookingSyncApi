@@ -14,8 +14,13 @@ def exportMessages():
 
     rows = []
 
-    pages = int(api.get('/inbox/messages?include=sender,hosts').json()['meta']['X-Total-Pages'])
-    print(f'Exporting messages. Number of pages: {pages}')
+    response = api.get('/inbox/messages?include=sender,hosts').json()
+    try:
+        pages = int(response['meta']['X-Total-Pages'])
+        print(f'Exporting messages. Number of pages: {pages}')
+    except:
+        print(f'Error at getting the number of pages.\n{response.status_code}\n{response}')
+        return
 
     for page in range(1, pages + 1):
         print(page)
@@ -24,6 +29,7 @@ def exportMessages():
         except:
             print('Error at getting the page.')
             continue
+
         for message in messages:
             try:
                 row = []

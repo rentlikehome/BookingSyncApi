@@ -59,7 +59,12 @@ def block_rentals(city_code, start_hour):
     print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
     api = API()
 
-    pages = int(api.get('/rentals?include=rentals_tags').json()['meta']['X-Total-Pages'])
+    response = api.get('/rentals?include=rentals_tags').json()
+    try:
+        pages = int(response['meta']['X-Total-Pages'])
+    except:
+        print(f'Error at getting the number of pages.\n{response.status_code}\n{response}')
+        return
 
     for page in range(1, pages + 1):
         data = api.get(f'/rentals?include=rentals_tags&page={page}').json()
@@ -70,4 +75,5 @@ def block_rentals(city_code, start_hour):
 
 
 if __name__ == '__main__':
-    block_rentals("POZ", 18)
+    # block_rentals("POZ", 18)
+    pass

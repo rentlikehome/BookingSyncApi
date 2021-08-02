@@ -12,6 +12,8 @@ class API:
         client_id and client_secret are taken from here:
         https://www.bookingsync.com/en/partners/applications/1011/edit
         """
+        self.session = requests.Session()
+
         self.client_id = 'f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64'
         self.client_secret = '995da035eb74a397ed4dfae342303686626367e1cc84f6a29c646e390aac5c35'
 
@@ -31,6 +33,10 @@ class API:
                 self.access_token = self.manualAuth(auth_code)
             else:
                 self.access_token = self.refreshAuth(refresh_token)
+
+    def __del__(self):
+        self.session.close()
+
 
 
     def getDefaultHeaders(self):
@@ -90,19 +96,24 @@ class API:
 
     def get(self, endpoint):
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
-        return requests.get(url, headers=self.getDefaultHeaders())
+        return self.session.get(url, headers=self.getDefaultHeaders())
 
     def delete(self, endpoint):
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
-        return requests.delete(url, headers=self.getDefaultHeaders())
+        return self.session.delete(url, headers=self.getDefaultHeaders())
 
     def post(self, endpoint, json):
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
-        return requests.post(url, headers=self.getDefaultHeaders(), json=json)
+        return self.session.post(url, headers=self.getDefaultHeaders(), json=json)
 
     def put(self, endpoint, json):
         url = f'https://www.bookingsync.com/api/v3{endpoint}'
-        return requests.put(url, headers=self.getDefaultHeaders(), json=json)
+        return self.session.put(url, headers=self.getDefaultHeaders(), json=json)
+    
+    @staticmethod
+    def print_json(data):
+        print(json.dumps(data, indent=4))
+
 
 
 if __name__ == '__main__':
