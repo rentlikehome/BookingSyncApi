@@ -3,7 +3,20 @@ import traceback
 from BookingSyncApi.api import API
 import pandas as pd
 
-def exportMessages():
+BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+def export_messages(filename, updated_since):
+    base_messages_url = '/inbox/messages?include=sender,hosts'
+    if updated_since:
+        base_messages_url += f'&updated_since={updated_since.strftime(BOOKINGSYNC_DATE_FORMAT)}'
+
+    columns = ['id', 'origin', 'sent_at', 'sender_type', 'host [firstname lastname (email)]', 'content']
+
+    try:
+        df = pd.read_excel(filename, index_col='id', usecols=columns)
+    except:
+        df = pd.DataFrame(columns=columns)
+
     api = API()
 
     hostPages = int(api.get('/hosts').json()['meta']['X-Total-Pages'])
@@ -14,7 +27,8 @@ def exportMessages():
 
     rows = []
 
-    response = api.get('/inbox/messages?include=sender,hosts').json()
+    response = api.get(base_messages_url).json()
+
     try:
         pages = int(response['meta']['X-Total-Pages'])
         print(f'Exporting messages. Number of pages: {pages}')
@@ -25,12 +39,14 @@ def exportMessages():
     for page in range(1, pages + 1):
         print(page)
         try:
-            messages = api.get(f'/inbox/messages?include=sender,hosts&page={page}').json()['messages']
+            messages = api.get(base_messages_url + f'&page={page}').json()['messages']
         except:
             print('Error at getting the page.')
             continue
 
         for message in messages:
+            if message['id'] in df.index:
+                print(f'Message update {message["id"]}')
             try:
                 row = []
                 row.append(message['id'])
@@ -50,15 +66,23 @@ def exportMessages():
                 traceback.print_exc()
                 print()
 
+    
 
-    columns = ['id', 'origin', 'sent_at', 'sender_type', 'host [firstname lastname (email)]', 'content']
-    df = pd.DataFrame(rows, columns=columns)
-    writer = pd.ExcelWriter(r"inbox_messages.xlsx", engine='xlsxwriter', options={'strings_to_urls' : False})
+    new_df = pd.DataFrame(rows, columns=columns).set_index('id')
+
+    df = df.combine_first(new_df)
+    df.update(new_df)
+
+    if not filename:
+        filename = 'inbox_messages.xlsx'
+
+    writer = pd.ExcelWriter(filename, engine='xlsxwriter', options={'strings_to_urls' : False})
     df.to_excel(writer)
     writer.close()
 
+    return df
 
-def exportConversations():
+def export_conversations():
     api = API()
 
     rows = []
@@ -80,8 +104,10 @@ def exportConversations():
 
     columns = ['id', 'created_at', 'closed_at', 'last_message_at', 'num_of_messages', 'subject']
     df = pd.DataFrame(rows, columns=columns)
-    df.to_excel("inbox_conversations.xlsx", engine='xlsxwriter')
 
+    return df
 
-exportMessages()
+if __name__ == '__main__':
+    export_messages(None, None)
+# exportMessages('inbox_messages.xlsx', '2021-08-05T00:00:00Z')
 # exportConversations()
