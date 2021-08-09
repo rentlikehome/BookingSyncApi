@@ -27,10 +27,10 @@ def export_messages(filename, updated_since):
 
     rows = []
 
-    response = api.get(base_messages_url).json()
+    response = api.get(base_messages_url)
 
     try:
-        pages = int(response['meta']['X-Total-Pages'])
+        pages = int(response.json()['meta']['X-Total-Pages'])
         print(f'Exporting messages. Number of pages: {pages}')
     except:
         print(f'Error at getting the number of pages.\n{response.status_code}\n{response}')

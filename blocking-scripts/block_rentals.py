@@ -59,9 +59,9 @@ def block_rentals(city_code, start_hour):
     print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
     api = API()
 
-    response = api.get('/rentals?include=rentals_tags').json()
+    response = api.get('/rentals?include=rentals_tags')
     try:
-        pages = int(response['meta']['X-Total-Pages'])
+        pages = int(response.json()['meta']['X-Total-Pages'])
     except:
         print(f'Error at getting the number of pages.\n{response.status_code}\n{response}')
         return
