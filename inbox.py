@@ -1,5 +1,6 @@
 import json
 import traceback
+import datetime
 from BookingSyncApi.api import API
 import pandas as pd
 
@@ -38,7 +39,6 @@ def export_messages(filename, updated_since):
     rows = []
 
     response = api.get(base_messages_url)
-
     try:
         pages = int(response.json()["meta"]["X-Total-Pages"])
         print(f"Exporting messages. Number of pages: {pages}")
@@ -47,8 +47,6 @@ def export_messages(filename, updated_since):
             f"Error at getting the number of pages.\n{response.status_code}\n{response}"
         )
         return
-
-    pages = 1
 
     for page in range(1, pages + 1):
         print(page)
@@ -136,6 +134,6 @@ def export_conversations():
 
 
 if __name__ == "__main__":
-    export_messages("inbox_messages.xlsx", None)
-# exportMessages('inbox_messages.xlsx', '2021-08-05T00:00:00Z')
-# exportConversations()
+    export_messages(None, None)
+    # exportMessages('inbox_messages.xlsx', '2021-08-05T00:00:00Z')
+    # exportConversations()

@@ -1,11 +1,12 @@
 from BookingSyncApi.api import API
-    
+
 import requests, json, csv
 import pandas
 import datetime
 
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
 
 def create_booking(start_hour):
     today = datetime.datetime.today()
@@ -20,27 +21,34 @@ def create_booking(start_hour):
 
     expiry = tomorrow.replace(hour=2).strftime(BOOKINGSYNC_DATE_FORMAT)
 
-
-    booking = {
-            "start_at" : start_at,
-            "end_at" : end_at, 
-            "tentative_expires_at" : expiry 
-        }
+    booking = {"start_at": start_at, "end_at": end_at, "tentative_expires_at": expiry}
 
     return booking
 
+
 def block_rental(api, rental_id, start_hour):
-    payload = { "bookings" : [create_booking(start_hour), ] }
-    response = api.post(f'/rentals/{rental_id}/bookings', payload)
+    payload = {
+        "bookings": [
+            create_booking(start_hour),
+        ]
+    }
+    response = api.post(f"/rentals/{rental_id}/bookings", payload)
 
     if response.status_code == 503:
-        response = api.post(f'/rentals/{rental_id}/bookings', payload)
+        response = api.post(f"/rentals/{rental_id}/bookings", payload)
 
     if response.status_code == 503:
-        print(f'Got 503 twice in a row. Skipping {rental_id}.')
+        print(f"Got 503 twice in a row. Skipping {rental_id}.")
 
-    print(response.status_code)
-    print(response.text)
+    """
+    Status codes:
+    - 201 - tentative booking created
+    - 422 - tentative booking not created because rental already booked during this period
+    """
+    if response.status_code not in [201, 422]:
+        print("Unrecognized status code: ")
+        print(response.status_code)
+        print(response.text)
 
 
 """
@@ -54,26 +62,29 @@ that if the number of rentals exceeds the request limit of 1000 we need to chang
 to take this into account.
 """
 
+
 def block_rentals(city_code, start_hour):
-    print(20*"-")
+    print(20 * "-")
     print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
     api = API()
 
-    response = api.get('/rentals?include=rentals_tags')
+    response = api.get("/rentals?include=rentals_tags")
     try:
-        pages = int(response.json()['meta']['X-Total-Pages'])
+        pages = int(response.json()["meta"]["X-Total-Pages"])
     except:
-        print(f'Error at getting the number of pages.\n{response.status_code}\n{response}')
+        print(
+            f"Error at getting the number of pages.\n{response.status_code}\n{response}"
+        )
         return
 
     for page in range(1, pages + 1):
-        data = api.get(f'/rentals?include=rentals_tags&page={page}').json()
-        for rental in data['rentals']:
-            if rental['name'][:3] == city_code:
-                block_rental(api, rental['id'], start_hour)
-    print(20*"-")
+        data = api.get(f"/rentals?include=rentals_tags&page={page}").json()
+        for rental in data["rentals"]:
+            if rental["name"][:3] == city_code:
+                block_rental(api, rental["id"], start_hour)
+    print(20 * "-")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # block_rentals("POZ", 18)
     pass
