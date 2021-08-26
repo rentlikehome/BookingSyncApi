@@ -49,7 +49,6 @@ def export_messages(filename, updated_since):
         return
 
     for page in range(1, pages + 1):
-        print(page)
         try:
             messages = api.get(base_messages_url + f"&page={page}").json()["messages"]
         except:
@@ -57,8 +56,6 @@ def export_messages(filename, updated_since):
             continue
 
         for message in messages:
-            if message["id"] in df.index:
-                print(f'Message update {message["id"]}')
             try:
                 row = []
                 row.append(message["id"])
