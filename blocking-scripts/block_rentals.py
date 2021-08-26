@@ -51,6 +51,17 @@ def block_rental(api, rental_id, start_hour):
         print(response.text)
 
 
+def retry_at_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            print(f"[!!] Got exception {e}. Retrying..")
+            func(*args, **kwargs)
+
+    return wrapper
+
+
 """
 Assumptions:
 - city_code is taken from first 3 chars of rental name
@@ -63,6 +74,7 @@ to take this into account.
 """
 
 
+@retry_at_error
 def block_rentals(city_code, start_hour):
     print(20 * "-")
     print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
@@ -72,10 +84,9 @@ def block_rentals(city_code, start_hour):
     try:
         pages = int(response.json()["meta"]["X-Total-Pages"])
     except:
-        print(
+        raise Exception(
             f"Error at getting the number of pages.\n{response.status_code}\n{response}"
         )
-        return
 
     for page in range(1, pages + 1):
         data = api.get(f"/rentals?include=rentals_tags&page={page}").json()
