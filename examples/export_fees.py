@@ -6,20 +6,47 @@ from datetime import datetime
 def export_fees():
     api = API()
 
-    with open('fees.csv', 'w') as csvfile:
-        writer = csv.writer(csvfile)
-        fieldnames = ['name', 'city', 'price']
-        writer.writerow(fieldnames)
+    columns = ['fee_id', 'booking_id', 'fee_name', 'city', 'price', 'booking_start_at', 'booking_end_at', 'num_of_guests']
+    endpoint = "/bookings?include=bookings_fees,rental&from=20201231"
 
-        ## !! Hardcoded pages
-        for page in range(1, 32):
-            response = api.get(f'/bookings?include=bookings_fees,rental&from=20200731&page={page}').json()
-            for booking in response['bookings']:
+    pages = int(api.get(endpoint).json()['meta']['X-Total-Pages'])
+    print(pages)
 
-                parsedStartDate = datetime.strptime(booking['start_at'], "%Y-%m-%dT%H:%M:%SZ")
-                if parsedStartDate.month == 8:
-                    for fee in booking['bookings_fees']:
-                        writer.writerow([fee['name']['en'], booking['rental']['city'], fee['price']])
+    rows = []
+    for page in range(1, pages + 1):
+        print(page)
+        response = api.get(endpoint + f'&page={page}').json()
+        for booking in response['bookings']:
+            parsedStartDate = datetime.strptime(booking['start_at'], "%Y-%m-%dT%H:%M:%SZ")
+            parsedEndDate = datetime.strptime(booking['end_at'], "%Y-%m-%dT%H:%M:%SZ")
+            for fee in booking['bookings_fees']:
+                row = []
+                row.append(fee['id'])
+                row.append(booking['id'])
+                row.append(fee['name']['en'])
+                row.append(booking['rental']['city'])
+                row.append(float(fee['price']))
+                row.append(parsedStartDate)
+                row.append(parsedEndDate)
+                num_of_guests = 0
+
+                try:
+                    num_of_guests += int(booking['adults'])
+                except TypeError:
+                    pass
+
+                try:
+                    num_of_guests += int(booking['children'])
+                except TypeError:
+                    pass
+
+                row.append(num_of_guests)
+
+                rows.append(row)
+
+    df = pd.DataFrame(rows, columns=columns,)
+    df.to_excel("fees_export.xlsx", engine='xlsxwriter')
+
 
 def export_fees_from_rental():
     api = API()
@@ -63,4 +90,4 @@ def export_cleaning_fees():
                         writer.writerow(fee)
 
 if __name__ == '__main__':
-    export_cleaning_fees()
+    export_fees()
