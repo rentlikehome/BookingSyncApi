@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 import os
 import json
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class API:
 
     def __init__(self, auth_code=None):

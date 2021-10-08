@@ -1,8 +1,9 @@
 from BookingSyncApi.api import API
 
-import requests, json, csv
-import pandas
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -38,7 +39,7 @@ def block_rental(api, rental_id, start_hour):
         response = api.post(f"/rentals/{rental_id}/bookings", payload)
 
     if response.status_code == 503:
-        print(f"Got 503 twice in a row. Skipping {rental_id}.")
+        logger.error(f"Got 503 twice in a row. Skipping {rental_id}.")
 
     """
     Status codes:
@@ -46,9 +47,7 @@ def block_rental(api, rental_id, start_hour):
     - 422 - tentative booking not created because rental already booked during this period
     """
     if response.status_code not in [201, 422]:
-        print("Unrecognized status code: ")
-        print(response.status_code)
-        print(response.text)
+        logger.error(f"Unrecognized status code [{response.status_code}]: {response.text}")
 
 
 def retry_at_error(func):
@@ -56,7 +55,7 @@ def retry_at_error(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            print(f"[!!] Got exception {e}. Retrying..")
+            logger.error(f"Got exception {e}. Retrying..")
             func(*args, **kwargs)
 
     return wrapper
@@ -76,8 +75,7 @@ to take this into account.
 
 @retry_at_error
 def block_rentals(city_code, start_hour):
-    print(20 * "-")
-    print(f"Starting blocking for {city_code} at {datetime.datetime.now().isoformat()}")
+    logger.info(f"Starting blocking for {city_code}.")
     api = API()
 
     response = api.get("/rentals?include=rentals_tags")
@@ -93,7 +91,6 @@ def block_rentals(city_code, start_hour):
         for rental in data["rentals"]:
             if rental["name"][:3] == city_code:
                 block_rental(api, rental["id"], start_hour)
-    print(20 * "-")
 
 
 if __name__ == "__main__":
