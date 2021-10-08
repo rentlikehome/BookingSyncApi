@@ -55,7 +55,7 @@ def retry_at_error(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            logger.error(f"Got exception {e}. Retrying..")
+            logger.exception(f"Got exception {e}. Retrying..")
             func(*args, **kwargs)
 
     return wrapper
@@ -79,12 +79,7 @@ def block_rentals(city_code, start_hour):
     api = API()
 
     response = api.get("/rentals?include=rentals_tags")
-    try:
-        pages = int(response.json()["meta"]["X-Total-Pages"])
-    except:
-        raise Exception(
-            f"Error at getting the number of pages.\n{response.status_code}\n{response}"
-        )
+    pages = int(response.json()["meta"]["X-Total-Pages"])
 
     for page in range(1, pages + 1):
         data = api.get(f"/rentals?include=rentals_tags&page={page}").json()
