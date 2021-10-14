@@ -22,7 +22,12 @@ def create_booking(start_hour):
 
     expiry = tomorrow.replace(hour=2).strftime(BOOKINGSYNC_DATE_FORMAT)
 
-    booking = {"start_at": start_at, "end_at": end_at, "tentative_expires_at": expiry}
+    booking = {
+        "start_at": start_at,
+        "end_at": end_at,
+        "tentative_expires_at": expiry,
+        "bookings_tags_ids": [5264],
+    }
 
     return booking
 
@@ -47,7 +52,9 @@ def block_rental(api, rental_id, start_hour):
     - 422 - tentative booking not created because rental already booked during this period
     """
     if response.status_code not in [201, 422]:
-        logger.error(f"Unrecognized status code [{response.status_code}]: {response.text}")
+        logger.error(
+            f"Unrecognized status code [{response.status_code}]: {response.text}"
+        )
 
 
 def retry_at_error(func):
