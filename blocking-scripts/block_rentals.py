@@ -26,7 +26,7 @@ def create_booking(start_hour):
         "start_at": start_at,
         "end_at": end_at,
         "tentative_expires_at": expiry,
-        "bookings_tags_ids": [5264],
+        "bookings_tag_ids": [5264],
     }
 
     return booking
