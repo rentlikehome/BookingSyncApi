@@ -3,7 +3,16 @@ from BookingSyncApi.api import API
 import datetime
 import logging
 
+import sentry_sdk
+
+sentry_sdk.init(
+    "https://1c57587ee7da41599b79b3669b6e6dda@o1026489.ingest.sentry.io/5992847",
+    environment="PROD",
+)
+
 logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.INFO)
 
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -44,7 +53,7 @@ def block_rental(api, rental_id, start_hour):
         response = api.post(f"/rentals/{rental_id}/bookings", payload)
 
     if response.status_code == 503:
-        logger.error(f"Got 503 twice in a row. Skipping {rental_id}.")
+        logger.warning(f"Got 503 twice in a row. Skipping {rental_id}.")
 
     """
     Status codes:
@@ -52,7 +61,7 @@ def block_rental(api, rental_id, start_hour):
     - 422 - tentative booking not created because rental already booked during this period
     """
     if response.status_code not in [201, 422]:
-        logger.error(
+        logger.warning(
             f"Unrecognized status code [{response.status_code}]: {response.text}"
         )
 
@@ -62,7 +71,7 @@ def retry_at_error(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            logger.exception(f"Got exception {e}. Retrying..")
+            logger.warning(f"Got exception {e}. Retrying..")
             func(*args, **kwargs)
 
     return wrapper
