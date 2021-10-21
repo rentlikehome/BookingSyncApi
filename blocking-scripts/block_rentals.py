@@ -11,7 +11,9 @@ sentry_sdk.init(
 )
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter(fmt="%(levelname)s %(asctime)s %(module)s %(name)s.%(funcName)s:%(lineno)s- %(message)s"))
+logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
