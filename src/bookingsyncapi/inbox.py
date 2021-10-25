@@ -1,7 +1,7 @@
 import json
 import traceback
 import datetime
-from BookingSyncApi.api import API
+from bookingsyncapi.api import API
 import pandas as pd
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"

@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: bookingsyncapi
+Version: 0.0.1
+Summary: BookingSync API wrapper for usage in python projects
+Home-page: UNKNOWN
+Author: Adam Szałowski
+Author-email: adamszalowski99@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+UNKNOWN
+

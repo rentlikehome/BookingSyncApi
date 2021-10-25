@@ -1,4 +1,4 @@
-from BookingSyncApi.api import API
+from bookingsyncapi.api import API
 
 import datetime
 import logging
