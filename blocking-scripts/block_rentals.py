@@ -3,7 +3,18 @@ from BookingSyncApi.api import API
 import datetime
 import logging
 
+import sentry_sdk
+
+sentry_sdk.init(
+    "https://1c57587ee7da41599b79b3669b6e6dda@o1026489.ingest.sentry.io/5992847",
+    environment="PROD",
+)
+
 logger = logging.getLogger(__name__)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter(fmt="%(levelname)s %(asctime)s %(module)s %(name)s.%(funcName)s:%(lineno)s- %(message)s"))
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -22,7 +33,12 @@ def create_booking(start_hour):
 
     expiry = tomorrow.replace(hour=2).strftime(BOOKINGSYNC_DATE_FORMAT)
 
-    booking = {"start_at": start_at, "end_at": end_at, "tentative_expires_at": expiry}
+    booking = {
+        "start_at": start_at,
+        "end_at": end_at,
+        "tentative_expires_at": expiry,
+        "bookings_tag_ids": [5264],
+    }
 
     return booking
 
@@ -39,7 +55,7 @@ def block_rental(api, rental_id, start_hour):
         response = api.post(f"/rentals/{rental_id}/bookings", payload)
 
     if response.status_code == 503:
-        logger.error(f"Got 503 twice in a row. Skipping {rental_id}.")
+        logger.warning(f"Got 503 twice in a row. Skipping {rental_id}.")
 
     """
     Status codes:
@@ -47,7 +63,9 @@ def block_rental(api, rental_id, start_hour):
     - 422 - tentative booking not created because rental already booked during this period
     """
     if response.status_code not in [201, 422]:
-        logger.error(f"Unrecognized status code [{response.status_code}]: {response.text}")
+        logger.warning(
+            f"Unrecognized status code [{response.status_code}]: {response.text}"
+        )
 
 
 def retry_at_error(func):
@@ -55,7 +73,7 @@ def retry_at_error(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            logger.exception(f"Got exception {e}. Retrying..")
+            logger.warning(f"Got exception {e}. Retrying..")
             func(*args, **kwargs)
 
     return wrapper

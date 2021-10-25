@@ -4,72 +4,72 @@ import pandas as pd
 
 from datetime import datetime, date
 
+
 def modify_multiple_terms(row, api):
     try:
-        rental = api.get(f'/rentals/{row["id"]}').json()['rentals'][0]
+        rental = api.get(f'/rentals/{row["id"]}').json()["rentals"][0]
     except:
         print("Apartment doesn't exist")
         return
-    midmap_id = rental['links']['mid_term_rate_map']
+    midmap_id = rental["links"]["mid_term_rate_map"]
 
-    response = api.get(f'/mid_term_rate_maps/{midmap_id}').json()
+    response = api.get(f"/mid_term_rate_maps/{midmap_id}").json()
 
-    mapJson = response['mid_term_rate_maps'][0]
-    midmap = mapJson['map'].split(',')
-    start = datetime.strptime(mapJson['start_date'], "%Y-%m-%d")
+    mapJson = response["mid_term_rate_maps"][0]
+    midmap = mapJson["map"].split(",")
+    start = datetime.strptime(mapJson["start_date"], "%Y-%m-%d")
     terms = [
-                ('rate1', start.date(), date(2021, 4, 1)),
-            ]
+        ("rate1", start.date(), date(2021, 4, 1)),
+    ]
 
     index = 0
     for term in terms:
         for _ in range((term[2] - term[1]).days):
-            midmap[index] = str(row[term[0]]) + '.0'
+            midmap[index] = str(row[term[0]]) + ".0"
             index += 1
 
-    midmap = ','.join(midmap)
+    midmap = ",".join(midmap)
 
     newJson = {
-            "mid_term_rate_maps": [
-                {
-                    "map" : midmap,
-                }
-            ]
+        "mid_term_rate_maps": [
+            {
+                "map": midmap,
+            }
+        ]
     }
 
-    
-    response = api.put(f'/mid_term_rate_maps/{midmap_id}', newJson).json()
+    response = api.put(f"/mid_term_rate_maps/{midmap_id}", newJson).json()
     print(json.dumps(response, indent=4))
+
 
 def modify_map(rental_id, value, end):
     api = API()
     # print(json.dumps(api.get('/rentals/128555').json(), indent=4))
 
-    rental = api.get(f'/rentals/{rental_id}').json()['rentals'][0]
-    midmap_id = rental['links']['mid_term_rate_map']
+    rental = api.get(f"/rentals/{rental_id}").json()["rentals"][0]
+    midmap_id = rental["links"]["mid_term_rate_map"]
 
-    response = api.get(f'/mid_term_rate_maps/{midmap_id}').json()
+    response = api.get(f"/mid_term_rate_maps/{midmap_id}").json()
     # print(json.dumps(response, indent=4))
 
-    mapJson = response['mid_term_rate_maps'][0]
-    midmap = mapJson['map'].split(',')
-    start = datetime.strptime(mapJson['start_date'], "%Y-%m-%d")
+    mapJson = response["mid_term_rate_maps"][0]
+    midmap = mapJson["map"].split(",")
+    start = datetime.strptime(mapJson["start_date"], "%Y-%m-%d")
 
     for i in range((end - start).days):
         midmap[i] = value
 
-    midmap = ','.join(midmap)
+    midmap = ",".join(midmap)
 
     newJson = {
-            "mid_term_rate_maps": [
-                {
-                    "map" : midmap,
-                }
-            ]
+        "mid_term_rate_maps": [
+            {
+                "map": midmap,
+            }
+        ]
     }
 
-    
-    response = api.put(f'/mid_term_rate_maps/{midmap_id}', newJson).json()
+    response = api.put(f"/mid_term_rate_maps/{midmap_id}", newJson).json()
     print(json.dumps(response, indent=4))
 
 
@@ -86,4 +86,3 @@ def modify_maps(filename):
 
 
 # modify_maps('rules.xlsx')
-    
