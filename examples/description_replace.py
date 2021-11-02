@@ -1,5 +1,5 @@
 import json
-from BookingSyncApi.api import API
+from bookingsync.api import API
 import pandas as pd
 
 api = API()
@@ -52,7 +52,7 @@ for page in range(1, pages + 1):
             ]
         }
 
-        print(api.put(f'/rentals/{rental["id"]}', payload).status_code)
+        # print(api.put(f'/rentals/{rental["id"]}', payload).status_code)
         new_row = [rental["id"], description_pl, description_en]
         rows.append(new_row)
 
