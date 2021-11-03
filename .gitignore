@@ -4,6 +4,8 @@ creds.json
 *Zone.Identifier
 **/*.pyc
 **/*.xlsx
+*.json
+secret_accounts_config.yml
 typings/
 venv/
 
