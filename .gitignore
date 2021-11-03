@@ -5,6 +5,7 @@ creds.json
 **/*.pyc
 **/*.xlsx
 *.json
+.env
 secret_accounts_config.yml
 typings/
 venv/
