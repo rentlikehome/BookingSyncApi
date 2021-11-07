@@ -1,9 +1,0 @@
-pyproject.toml
-setup.cfg
-src/bookingsyncapi/api.py
-src/bookingsyncapi/inbox.py
-src/bookingsyncapi.egg-info/PKG-INFO
-src/bookingsyncapi.egg-info/SOURCES.txt
-src/bookingsyncapi.egg-info/dependency_links.txt
-src/bookingsyncapi.egg-info/requires.txt
-src/bookingsyncapi.egg-info/top_level.txt
