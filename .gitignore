@@ -1,9 +1,14 @@
-archive/
-__pycache__/
+archive
+__pycache__
 creds.json
 *Zone.Identifier
 **/*.pyc
 **/*.xlsx
-typings/
-venv/
+**/*.egg-info/
+*.json
+.env
+secret_accounts_config.yml
+typings
+venv
+.venv
 

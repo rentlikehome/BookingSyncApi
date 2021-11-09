@@ -1,13 +1,12 @@
 import json
 import traceback
 import datetime
-from bookingsyncapi.api import API
 import pandas as pd
 
 BOOKINGSYNC_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def export_messages(filename, updated_since):
+def export_messages(api, filename, updated_since):
     base_messages_url = "/inbox/messages?include=sender,hosts"
     if updated_since:
         base_messages_url += (
@@ -27,8 +26,6 @@ def export_messages(filename, updated_since):
         df = pd.read_excel(filename, index_col="id", usecols=columns)
     except:
         df = pd.DataFrame(columns=columns).set_index("id")
-
-    api = API()
 
     hostPages = int(api.get("/hosts").json()["meta"]["X-Total-Pages"])
     hosts = {}
@@ -95,9 +92,7 @@ def export_messages(filename, updated_since):
     return df
 
 
-def export_conversations():
-    api = API()
-
+def export_conversations(api):
     rows = []
 
     pages = int(api.get("/inbox/conversations").json()["meta"]["X-Total-Pages"])

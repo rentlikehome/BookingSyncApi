@@ -1,7 +1,8 @@
-from bookingsyncapi.api import API
+from bookingsyncapi.factory import YAMLApiFactory
 
 import datetime
 import logging
+import dotenv
 
 import sentry_sdk
 
@@ -92,9 +93,11 @@ to take this into account.
 
 
 @retry_at_error
-def block_rentals(city_code, start_hour):
+def block_rentals(account_id, city_code, start_hour):
     logger.info(f"Starting blocking for {city_code}.")
-    api = API()
+    config_file = dotenv.dotenv_values()["BOOKINGSYNCAPI_CONFIG_FILE"]
+
+    api = YAMLApiFactory(config_file).get_api(account_id)
 
     response = api.get("/rentals?include=rentals_tags")
     pages = int(response.json()["meta"]["X-Total-Pages"])
@@ -107,5 +110,5 @@ def block_rentals(city_code, start_hour):
 
 
 if __name__ == "__main__":
-    # block_rentals("POZ", 18)
+    # block_rentals("14030", "POZ", 18)
     pass
