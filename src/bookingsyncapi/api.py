@@ -9,8 +9,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class AuthorizationError(Exception):
     pass
+
 
 class API:
     def __init__(self, client_id, client_secret, creds_path):
@@ -67,7 +69,7 @@ class API:
         if response.status_code == 401:
             raise AuthorizationError(f"Failed to authorize: {response.text}")
 
-        tokens = response.json() 
+        tokens = response.json()
 
         with open(creds_path, "w") as f:
             json.dump(tokens, f, indent=4)
@@ -81,22 +83,24 @@ class API:
         'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rates_write%20rentals_read%20bookings_write%20rentals_write%20clients_write%20payments_read%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
         Subseqent authorizations don't require auth code because they use refresh token.
         """
-        
-        if pathlib.Path(creds_path).is_file():
-            raise Exception(f"Creds file {creds_path} already exists. Aborting manual authorization...")
 
+        if pathlib.Path(creds_path).is_file():
+            raise Exception(
+                f"Creds file {creds_path} already exists. Aborting manual authorization..."
+            )
 
         base_url = "https://www.bookingsync.com/oauth/authorize"
         params = {
             "client_id": client_id,
             "response_type": "code",
             "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
-            "scope": " ".join(scope)
+            "scope": " ".join(scope),
         }
 
         import urllib
+
         url = base_url + "?" + urllib.parse.urlencode(params)
-        
+
         print("Please visit following URL to obtain authorization code:")
         print(url)
         print("Input authorization code:")

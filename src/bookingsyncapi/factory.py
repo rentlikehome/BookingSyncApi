@@ -16,7 +16,10 @@ class YAMLApiFactory:
         account = self.config["accounts"][account_id]
 
         if not account["creds_dir"]:
-            creds_path = pathlib.Path(self.config_filepath).parent.resolve() / f"{account_id}.json"
+            creds_path = (
+                pathlib.Path(self.config_filepath).parent.resolve()
+                / f"{account_id}.json"
+            )
         else:
             creds_path = pathlib.Path(account["creds_dir"]) / f"{account_id}.json"
 
@@ -51,8 +54,5 @@ class YAMLApiFactory:
                 traceback.print_exc()
 
 
-
-
 if __name__ == "__main__":
     pass
-
