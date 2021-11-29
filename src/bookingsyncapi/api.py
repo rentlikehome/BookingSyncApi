@@ -1,3 +1,4 @@
+import time
 import requests, json, csv
 from datetime import datetime, timedelta
 
@@ -20,6 +21,7 @@ class API:
         client_id and client_secret are taken from here:
         https://www.bookingsync.com/en/partners/applications/1011/edit
         """
+        self.URL = "https://www.bookingsync.com/api/v3"
         self.session = requests.Session()
 
         self.client_id = client_id
@@ -33,13 +35,20 @@ class API:
             raise AuthorizationError(f"Couldn't load creds from {creds_path}")
 
         self.access_token = creds.get("access_token", None)
-        refresh_token = creds.get("refresh_token", None)
+        self.refresh_token = creds.get("refresh_token", None)
 
-        if not self.access_token or not refresh_token:
+        if not self.access_token or not self.refresh_token:
             raise AuthorizationError(f"Creds file {creds_path} is missing tokens")
 
-        if not self.is_authorized():
-            self.access_token = self.refresh_access_token(refresh_token)
+        expires_in = creds.get("expires_in", None)
+        created_at = creds.get("created_at", None)
+
+        if not expires_in or not created_at:
+            raise AuthorizationError(f"Creds file {creds_path} is missing tokens")
+
+        self.expires_at = created_at + expires_in
+
+        self.refresh_if_expired()
 
     def __del__(self):
         self.session.close()
@@ -49,9 +58,8 @@ class API:
             "Authorization": f"Bearer {self.access_token}",
         }
 
-    def is_authorized(self):
-        response = self.get("/bookings")
-        return response.status_code != 401
+    def is_expired(self):
+        return self.expires_at < int(time.time()) + 1
 
     @staticmethod
     def authorize(auth, data, creds_path):
@@ -116,14 +124,18 @@ class API:
 
         return cls.authorize(auth, data, creds_path)
 
-    def refresh_access_token(self, refresh_token):
+    def refresh_access_token(self):
         data = {
-            "refresh_token": refresh_token,
+            "refresh_token": self.refresh_token,
             "grant_type": "refresh_token",
             "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
         }
         auth = (self.client_id, self.client_secret)
-        return self.authorize(auth, data, self.creds_path)
+        self.access_token = self.authorize(auth, data, self.creds_path)
+
+    def refresh_if_expired(self):
+        if self.is_expired():
+            self.refresh_access_token()
 
     """
     Below are convienient wrappers for requests lib that automatically
@@ -131,20 +143,26 @@ class API:
     """
 
     def get(self, endpoint):
-        url = f"https://www.bookingsync.com/api/v3{endpoint}"
-        return self.session.get(url, headers=self.get_default_headers())
+        self.refresh_if_expired()
+        return self.session.get(self.URL + endpoint, headers=self.get_default_headers())
 
     def delete(self, endpoint):
-        url = f"https://www.bookingsync.com/api/v3{endpoint}"
-        return self.session.delete(url, headers=self.get_default_headers())
+        self.refresh_if_expired()
+        return self.session.delete(
+            self.URL + endpoint, headers=self.get_default_headers()
+        )
 
     def post(self, endpoint, json):
-        url = f"https://www.bookingsync.com/api/v3{endpoint}"
-        return self.session.post(url, headers=self.get_default_headers(), json=json)
+        self.refresh_if_expired()
+        return self.session.post(
+            self.URL + endpoint, headers=self.get_default_headers(), json=json
+        )
 
     def put(self, endpoint, json):
-        url = f"https://www.bookingsync.com/api/v3{endpoint}"
-        return self.session.put(url, headers=self.get_default_headers(), json=json)
+        self.refresh_if_expired()
+        return self.session.put(
+            self.URL + endpoint, headers=self.get_default_headers(), json=json
+        )
 
     def get_remaining_requests(self):
         headers = self.get("/rentals").headers
