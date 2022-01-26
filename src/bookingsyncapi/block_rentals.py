@@ -102,6 +102,9 @@ def block_rentals(account_id, city_code, start_hour):
     config_file = dotenv.dotenv_values()["BOOKINGSYNCAPI_CONFIG_FILE"]
 
     api = YAMLApiFactory(config_file).get_api(account_id)
+    if not api:
+        logger.info(f"No API found for account {account_id}")
+        return
 
     response = api.get("/rentals?include=rentals_tags")
     pages = int(response.json()["meta"]["X-Total-Pages"])

@@ -26,7 +26,10 @@ class YAMLApiFactory:
         return creds_path
 
     def get_api(self, account_id):
-        account = self.config["accounts"][account_id]
+        try:
+            account = self.config["accounts"][account_id]
+        except KeyError:
+            return None
 
         return API(
             account["client_id"],

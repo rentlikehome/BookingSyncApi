@@ -11,4 +11,5 @@ secret_accounts_config.yml
 typings
 venv
 .venv
-
+build
+.idea

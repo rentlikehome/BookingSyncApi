@@ -40,7 +40,6 @@ for page in range(1, pages + 1):
         backup_row = [rental["id"], description_pl, description_en]
         backup_rows.append(backup_row)
 
-        
         status_row = [
             rental["id"],
             rental["name"][:3],
@@ -48,7 +47,9 @@ for page in range(1, pages + 1):
             bool(payload["rentals"][0].get("description_en", False)),
         ]
         print(status_row)
-        if payload["rentals"][0].get("description_en", False) or payload["rentals"][0].get("description_pl", False):
+        if payload["rentals"][0].get("description_en", False) or payload["rentals"][
+            0
+        ].get("description_pl", False):
             print(api.put(f'/rentals/{rental["id"]}', payload).status_code)
 
         status_rows.append(status_row)
