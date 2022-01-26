@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     api = YAMLApiFactory(config).get_api(args.account)
 
-    df = export_endpoint(api, args.endpoint)
+    if api:
+        df = export_endpoint(api, args.endpoint)
 
-    df.to_excel(args.out)
+        df.to_excel(args.out)
