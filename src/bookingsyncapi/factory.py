@@ -32,8 +32,8 @@ class YAMLApiFactory:
             return None
 
         return API(
-            account["client_id"],
-            account["client_secret"],
+            self.config["client_id"],
+            self.config["client_secret"],
             self.get_creds_path(account_id),
         )
 
@@ -43,10 +43,10 @@ class YAMLApiFactory:
         print(f"Manual authorization for account {account.get('name', account_id)}")
 
         API.manual_authorization(
-            account["client_id"],
-            account["client_secret"],
+            self.config["client_id"],
+            self.config["client_secret"],
             self.get_creds_path(account_id),
-            account["scope"],
+            self.config["scope"],
         )
 
     def authorize_all(self):
@@ -55,6 +55,13 @@ class YAMLApiFactory:
                 self.authorize_api(account_id)
             except Exception:
                 traceback.print_exc()
+
+    def check_xcontentsig(self, sig, request_body):
+        """
+        Wraps API.check_xcontentsig passing it client_secret
+        from config file.
+        """
+        return API.check_xcontentsig(self.config["client_secret"], sig, request_body)
 
 
 if __name__ == "__main__":
