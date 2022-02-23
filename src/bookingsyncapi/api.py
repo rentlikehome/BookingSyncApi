@@ -196,7 +196,7 @@ class API:
         if isinstance(client_secret, str):
             client_secret = client_secret.encode()
 
-        encoded_body = list(base64.b64encode(body))
+        encoded_body = list(base64.b64encode(request_body))
 
         # We have to pad encoded body with newlines every 60 chars
         # and at the end since this is how Ruby, which is used to calculate
