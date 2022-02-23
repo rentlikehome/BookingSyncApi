@@ -1,8 +1,9 @@
 import time
 import requests, json, csv
 from datetime import datetime, timedelta
-
-
+import base64
+import hashlib
+import hmac
 import pathlib
 import json
 
@@ -172,7 +173,45 @@ class API:
     def print_json(data):
         print(json.dumps(data, indent=4))
 
+    @staticmethod
+    def check_xcontentsig(client_secret, sig, request_body):
+        """
+        Checks if signature matches the received body.
+        This doesn't require being authenticated so we avoid
+        making unnecessery requests by making this a static method.
+
+        The signature is calculated accroding to BSync documentation:
+        https://developers.bookingsync.com/guides/webhook-subscriptions/
+
+        Args:
+            client_secret (str, bytes): client secret indentyfing app. If str is passed
+                it is converted to bytes using default encoding.
+            sig: signature received in headers, usually "X-Content-Signature" field
+            request_body (bytes): request body before serialization to json
+
+        Returns:
+            bool: True if signature match, False otherwise.
+        """
+
+        if isinstance(client_secret, str):
+            client_secret = client_secret.encode()
+
+        encoded_body = list(base64.b64encode(body))
+
+        # We have to pad encoded body with newlines every 60 chars
+        # and at the end since this is how Ruby, which is used to calculate
+        # original sig, does it by default.
+        padding_spacing = 60
+        new_encoded = b""
+        for pos in range(0, len(encoded_body), padding_spacing):
+            new_encoded += bytes(encoded_body[pos : pos + padding_spacing]) + b"\n"
+
+        body_sig = hmac.new(
+            client_secret, new_encoded, digestmod=hashlib.sha1
+        ).hexdigest()
+
+        return hmac.compare_digest(sig, body_sig)
+
 
 if __name__ == "__main__":
-    # api = API("135b7da8ae141031fead790513828f29cee8410e97d430cd9fdf2aedaf349743")
-    API.manual_authorization("client_id_11", "", "creds", ["write", "read"])
+    pass
