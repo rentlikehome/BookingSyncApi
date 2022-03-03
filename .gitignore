@@ -13,3 +13,4 @@ venv
 .venv
 build
 .idea
+.pre-commit-config.yaml
