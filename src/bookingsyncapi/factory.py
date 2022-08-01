@@ -56,7 +56,7 @@ class YAMLApiFactory:
             except Exception:
                 traceback.print_exc()
 
-    def get_authorization_url(self, account_id, redirect_uri):
+    def get_authorization_url(self, redirect_uri):
         return API.get_authorization_url(
             self.config["client_id"], self.config["scope"], redirect_uri
         )
