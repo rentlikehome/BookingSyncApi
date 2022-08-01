@@ -37,24 +37,38 @@ class YAMLApiFactory:
             self.get_creds_path(account_id),
         )
 
-    def authorize_api(self, account_id):
+    def authorize_api_cli(self, account_id):
         account = self.config["accounts"][account_id]
 
         print(f"Manual authorization for account {account.get('name', account_id)}")
 
-        API.manual_authorization(
+        API.cli_authorization(
             self.config["client_id"],
             self.config["client_secret"],
             self.get_creds_path(account_id),
             self.config["scope"],
         )
 
-    def authorize_all(self):
+    def authorize_all_cli(self):
         for account_id in self.config["accounts"].keys():
             try:
-                self.authorize_api(account_id)
+                self.authorize_api_cli(account_id)
             except Exception:
                 traceback.print_exc()
+
+    def get_authorization_url(self, account_id, redirect_uri):
+        return API.get_authorization_url(
+            self.config["client_id"], self.config["scope"], redirect_uri
+        )
+
+    def authorize_api(self, account_id, auth_code, redirect_uri):
+        return API.manual_authorization(
+            self.config["client_id"],
+            self.config["client_secret"],
+            self.get_creds_path(account_id),
+            auth_code,
+            redirect_uri,
+        )
 
     def check_xcontentsig(self, sig, request_body):
         """

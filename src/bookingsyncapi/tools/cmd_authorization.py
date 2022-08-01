@@ -20,6 +20,6 @@ if __name__ == "__main__":
         config = dotenv.dotenv_values()["BOOKINGSYNCAPI_CONFIG_FILE"]
 
     if args.all:
-        YAMLApiFactory(config).authorize_all()
+        YAMLApiFactory(config).authorize_all_cli()
     else:
-        YAMLApiFactory(config).authorize_api(args.account)
+        YAMLApiFactory(config).authorize_api_cli(args.account)
