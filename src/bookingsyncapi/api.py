@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import pathlib
 import json
+import urllib
 
 import logging
 
@@ -37,6 +38,7 @@ class API:
 
         self.access_token = creds.get("access_token", None)
         self.refresh_token = creds.get("refresh_token", None)
+        self.redirect_uri = creds.get("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
 
         if not self.access_token or not self.refresh_token:
             raise AuthorizationError(f"Creds file {creds_path} is missing tokens")
@@ -59,6 +61,20 @@ class API:
             "Authorization": f"Bearer {self.access_token}",
         }
 
+    @staticmethod
+    def get_authorization_url(
+        client_id, scope, redirect_uri="urn:ietf:wg:oauth:2.0:oob"
+    ):
+        base_url = "https://www.bookingsync.com/oauth/authorize"
+        params = {
+            "client_id": client_id,
+            "response_type": "code",
+            "redirect_uri": redirect_uri,
+            "scope": " ".join(scope),
+        }
+
+        return base_url + "?" + urllib.parse.urlencode(params)
+
     def is_expired(self):
         return self.expires_at < int(time.time()) + 1
 
@@ -79,6 +95,7 @@ class API:
             raise AuthorizationError(f"Failed to authorize: {response.text}")
 
         tokens = response.json()
+        tokens["redirect_uri"] = data.get("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
 
         with open(creds_path, "w") as f:
             json.dump(tokens, f, indent=4)
@@ -86,7 +103,7 @@ class API:
         return tokens["access_token"]
 
     @classmethod
-    def manual_authorization(cls, client_id, client_secret, creds_path, scope):
+    def cli_authorization(cls, client_id, client_secret, creds_path, scope):
         """
         Auth code has to be taken by visting this long url in browser each time we have to manually authorize meaning we don't have a refresh token.
         'https://www.bookingsync.com/oauth/authorize?client_id=f4954a04b5987e96e9fb99b4ab04f8c2b47d7902c32feb63a63a220d04727d64&scope=bookings_read%20rates_write%20rentals_read%20bookings_write%20rentals_write%20clients_write%20payments_read%20inbox_write&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
@@ -98,27 +115,28 @@ class API:
                 f"Creds file {creds_path} already exists. Aborting manual authorization..."
             )
 
-        base_url = "https://www.bookingsync.com/oauth/authorize"
-        params = {
-            "client_id": client_id,
-            "response_type": "code",
-            "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
-            "scope": " ".join(scope),
-        }
-
-        import urllib
-
-        url = base_url + "?" + urllib.parse.urlencode(params)
+        url = cls.get_authorization_url(client_id, scope)
 
         print("Please visit following URL to obtain authorization code:")
         print(url)
         print("Input authorization code:")
         auth_code = input()
 
+        return cls.manual_authorization(client_id, client_secret, creds_path, auth_code)
+
+    @classmethod
+    def manual_authorization(
+        cls,
+        client_id,
+        client_secret,
+        creds_path,
+        auth_code,
+        redirect_uri="urn:ietf:wg:oauth:2.0:oob",
+    ):
         data = {
             "code": auth_code,
             "grant_type": "authorization_code",
-            "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+            "redirect_uri": redirect_uri,
         }
 
         auth = (client_id, client_secret)
@@ -129,7 +147,7 @@ class API:
         data = {
             "refresh_token": self.refresh_token,
             "grant_type": "refresh_token",
-            "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+            "redirect_uri": self.redirect_uri,
         }
         auth = (self.client_id, self.client_secret)
         self.access_token = self.authorize(auth, data, self.creds_path)
