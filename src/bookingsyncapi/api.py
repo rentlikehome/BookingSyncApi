@@ -89,9 +89,8 @@ class API:
             allow_redirects=False,
             auth=auth,
         )
-        # print(response.text)
 
-        if response.status_code == 401:
+        if not response.ok:
             raise AuthorizationError(f"Failed to authorize: {response.text}")
 
         tokens = response.json()
